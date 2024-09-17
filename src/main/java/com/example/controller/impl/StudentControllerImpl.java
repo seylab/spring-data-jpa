@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rest/api/student")
+
 public class StudentControllerImpl implements IStudentController {
 
     @Autowired
@@ -25,6 +26,18 @@ public class StudentControllerImpl implements IStudentController {
     @Override
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
+    }
+
+    @GetMapping(path = "list/{id}")
+    @Override
+    public Student getStudentById(@PathVariable(name = "id") Integer id) {
+        return studentService.getStudentById(id);
+    }
+
+    @DeleteMapping(path = "/delete/{id}")
+    @Override
+    public void deleteStudent(@PathVariable(name = "id") Integer id) {
+        studentService.deleteStudent(id);
     }
 
 

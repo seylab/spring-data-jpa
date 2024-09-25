@@ -1,7 +1,9 @@
 package com.example.services.impl;
 
+import com.example.dto.DtoCourse;
 import com.example.dto.DtoStudent;
 import com.example.dto.DtoStudentIU;
+import com.example.entities.Course;
 import com.example.entities.Student;
 import com.example.repository.StudentRepository;
 import com.example.services.IStudentService;
@@ -47,13 +49,25 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     public DtoStudent getStudentById(Integer id) {
-        DtoStudent dto = new DtoStudent();
-        Optional<Student> optional = studentRepository.findStudentById(id);
-        if (optional.isPresent()) {
-            Student dbStudent = optional.get();
-            BeanUtils.copyProperties(dbStudent, dto);
+        DtoStudent dtoStudent = new DtoStudent();
+
+
+        Optional<Student> optional = studentRepository.findById(id);
+        if (optional.isEmpty()) {
+            return null;
         }
-        return dto;
+        Student dbStudent = optional.get();
+        BeanUtils.copyProperties(dbStudent, dtoStudent);
+
+        if (dbStudent.getCourses()!=null && !dbStudent.getCourses().isEmpty()) {
+            for (Course course : dbStudent.getCourses()) {
+                DtoCourse dtoCourse = new DtoCourse();
+                dtoCourse.setId(course.getId());
+                dtoCourse.setName(course.getName());
+                dtoStudent.getCourses().add(dtoCourse);
+            }
+        }
+        return dtoStudent;
     }
 
     @Override

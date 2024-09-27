@@ -339,3 +339,126 @@ public class CourseControllerImpl implements ICourseController {
     }
 }
 ```
+## application.properties
+Spring Boot uygulamalarında yapılandırma ayarları genellikle `application.properties` dosyasına yazılır. 
+Bu dosya, uygulamanın çeşitli bileşenlerine değer atamak için kullanılır. 
+
+Örnek olarak:
+
+```properties
+# Lesson_38 'application.properties'.md
+app.name=MyApplication
+app.version=1.0.0
+app.author=John Doe
+```
+Yukarıdaki dosyada, ``app.name``, ``app.version``, ve ``app.author`` gibi anahtar-değer çiftleri tanımlanmıştır. Bu değerler, Spring içerisinde farklı bileşenlerde kullanılabilir.
+
+### 1. ``@PropertySource`` Anotasyonu
+
+``@PropertySource``, belirtilen bir dosyadan özellik (property) yüklemek için kullanılır. 
+Genellikle bir ``@Configuration`` sınıfında yer alır ve ``application.properties`` 
+dışında farklı bir özellik dosyasını eklemek için kullanılır.
+
+Örnek kullanım:
+```java
+@Configuration
+@PropertySource("classpath:custom.properties")
+public class AppConfig {
+    // Özellik dosyasından değerleri kullanmak için kullanılacak sınıf
+}
+```
+Bu anotasyon ile ``custom.properties`` adlı dosyadaki değerler uygulamaya yüklenir ve daha sonra ``@Value`` ile erişilebilir hale gelir.
+
+Not: Eğer Spring Boot kullanıyorsanız, varsayılan olarak ``application.properties`` dosyasını 
+eklemenize gerek yoktur. ``@PropertySource`` sadece ek yapılandırma dosyaları için kullanılır.
+
+### 2. ``@Value`` Anotasyonu
+
+``@Value``, ``application.properties`` veya diğer özellik dosyalarındaki anahtar-değer çiftlerini doğrudan sınıf 
+alanlarına atamak için kullanılır. Bu, sınıf içindeki herhangi bir alana dışarıdan gelen yapılandırma değerini 
+enjekte etmenin basit bir yoludur.
+
+Örnek kullanım:
+````java
+@Component
+public class AppProperties {
+
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Value("${app.author}")
+    private String appAuthor;
+
+    public void printProperties() {
+        System.out.println("App Name: " + appName);
+        System.out.println("App Version: " + appVersion);
+        System.out.println("App Author: " + appAuthor);
+    }
+}
+````
+* **Açıklama:**
+
+``@Value("${app.name}")``: ``application.properties`` dosyasındaki app.name değerini alır ve appName değişkenine atar. 
+
+``@Value("${app.version}")``: ``application.properties`` dosyasındaki app.version değerini alır ve appVersion değişkenine atar.
+
+``@Value("${app.author}")``: ``application.properties`` dosyasındaki app.author değerini alır ve appAuthor değişkenine atar.
+Uygulama çalıştırıldığında, printProperties metodu bu değerleri konsola yazdırır.
+
+### Örnek ``application.properties`` ve Kullanım:
+
+#### ``application.properties``
+````properties
+app.name=ExampleApp
+app.version=2.1.0
+app.author=Jane Doe
+````
+
+#### Java Class
+
+````java
+@Component
+public class AppConfig {
+
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Value("${app.author}")
+    private String appAuthor;
+
+    public void displayConfig() {
+        System.out.println("Application Name: " + appName);
+        System.out.println("Version: " + appVersion);
+        System.out.println("Author: " + appAuthor);
+    }
+}
+````
+
+#### Output
+```yaml
+Application Name: ExampleApp
+Version: 2.1.0
+Author: Jane Doe
+```
+
+### 3. Varsayılan Değer Atama
+Eğer bir özellik yapılandırma dosyasında bulunmuyorsa, ``@Value`` anotasyonu ile varsayılan bir değer atanabilir. 
+Bu durumda, o anahtar yapılandırma dosyasında tanımlı değilse bile varsayılan değer kullanılacaktır.
+
+Örnek:
+```java
+@Value("${app.description:Default description}")
+private String appDescription;
+```
+Eğer app.description değeri ``application.properties`` dosyasında yoksa, Default description değeri atanır.
+
+### Özet:
+``application.properties`` dosyası, Spring Boot uygulamalarında yapılandırma ayarları için kullanılır.
+``@PropertySource``, dış özellik dosyalarını yüklemek için kullanılır.
+``@Value``, özellik dosyalarından alınan değerleri sınıf alanlarına enjekte eder.
